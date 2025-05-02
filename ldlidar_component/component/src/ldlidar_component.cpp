@@ -105,8 +105,7 @@ void LdLidarComponent::getCommParams()
   getParam(
     "comm.baudrate", _baudrate, _baudrate, "Serial baudrate", false,
     " * Baudrate: ");
-  
-      getParam(
+  getParam(
     "comm.timeout_msec", _readTimeOut_msec, _readTimeOut_msec, "Data reading timeout in msec",
     false, " * Timeout [msec]: ");
   
