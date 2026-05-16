@@ -12,6 +12,8 @@ LD19             |  LD06
 :-------------------------:|:-------------------------:
 ![ld19](https://user-images.githubusercontent.com/3648617/204473718-803d25d9-605a-4eaa-a047-d5d3524eead8.png)  |  ![ld06](https://user-images.githubusercontent.com/3648617/204473720-97f72c31-188e-4f5c-b98b-1033a5afe91e.png)
 
+You can find a detailed description of the packages in this repository in the [myzhar.tech website](https://myzhar.tech/projects/ros2/ldrobot-lidar-ros2/).
+
 ## Get the lidar
 
 My lidar (LD19) comes from the [LDRobot kickstarter campaing](https://www.kickstarter.com/projects/ldrobot/ld-air-lidar-360-tof-sensor-for-all-robotic-applications) ended in 2021.
