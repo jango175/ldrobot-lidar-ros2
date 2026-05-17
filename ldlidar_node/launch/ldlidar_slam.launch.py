@@ -17,16 +17,17 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node, LifecycleNode
+from launch_ros.actions import (
+    Node, LifecycleNode,
+    ComposableNodeContainer,
+    LoadComposableNodes
+)
 
 
 def generate_launch_description():
     
-    node_name = LaunchConfiguration('node_name')
-
     # Lifecycle manager configuration file
     lc_mgr_config_path = os.path.join(
         get_package_share_directory('ldlidar_node'),
@@ -40,6 +41,24 @@ def generate_launch_description():
         'params',
         'slam_toolbox.yaml'
     )
+
+    # ROS 2 Component Container
+    container_name='slam_demo_container'
+    distro = os.environ['ROS_DISTRO']
+    if distro == 'foxy':
+        # Foxy does not support the isolated mode
+        container_exec='component_container'
+    else:
+        container_exec='component_container_isolated'
+    demo_container = ComposableNodeContainer(
+                name=container_name,
+                namespace='',
+                package='rclcpp_components',
+                executable=container_exec,
+                composable_node_descriptions=[
+                ],
+                output='screen',
+        )
 
     # Lifecycle manager node
     lc_mgr_node = Node(
@@ -58,7 +77,7 @@ def generate_launch_description():
           package='slam_toolbox',
           executable='async_slam_toolbox_node',
           namespace='',
-          name='slam_toolbox',
+          name='slam_toolbox_node',
           output='screen',
           parameters=[
             # YAML files
@@ -76,7 +95,8 @@ def generate_launch_description():
             '/launch/ldlidar_bringup.launch.py'
         ]),
         launch_arguments={
-            'node_name': 'ldlidar_node'
+            'node_name': 'ldlidar_node',
+            'container_name': container_name
         }.items()
     )
 
@@ -110,6 +130,9 @@ def generate_launch_description():
 
     # Launch Nav2 Lifecycle Manager
     ld.add_action(lc_mgr_node)
+
+    # Node Container
+    ld.add_action(demo_container)
 
     # Launch SLAM Toolbox node
     ld.add_action(slam_toolbox_node)
