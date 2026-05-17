@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+2026-05-17
+----------
+
+- Replace vendored `ldlidar_driver` folder with the official [ldlidar_stl_sdk](https://github.com/ldrobotSensorTeam/ldlidar_stl_sdk) git submodule
+  - Clone with `git clone --recurse-submodules` or run `git submodule update --init --recursive` after cloning
+
 2025-02-16
 ----------
 

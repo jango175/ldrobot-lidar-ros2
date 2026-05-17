@@ -138,18 +138,39 @@ set(COMPONENT_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/component/src/ldlidar_component.cpp
 )
 
-# LDLidar driver
-add_subdirectory(ldlidar_driver)
+# LDLidar STL SDK (git submodule)
+set(LDLIDAR_SDK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_stl_sdk/ldlidar_driver)
+
+file(GLOB_RECURSE LDLIDAR_SDK_HDR
+    "${LDLIDAR_SDK_DIR}/include/*.h"
+    "${LDLIDAR_SDK_DIR}/include/*.hpp"
+)
+file(GLOB_RECURSE LDLIDAR_SDK_SRC
+    "${LDLIDAR_SDK_DIR}/src/*.c"
+    "${LDLIDAR_SDK_DIR}/src/*.cpp"
+)
+
+add_library(ldlidar SHARED ${LDLIDAR_SDK_HDR} ${LDLIDAR_SDK_SRC})
+set_property(TARGET ldlidar PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_include_directories(ldlidar PUBLIC
+    ${LDLIDAR_SDK_DIR}/include/core
+    ${LDLIDAR_SDK_DIR}/include/dataprocess
+    ${LDLIDAR_SDK_DIR}/include/filter
+    ${LDLIDAR_SDK_DIR}/include/logger
+    ${LDLIDAR_SDK_DIR}/include/networkcom
+    ${LDLIDAR_SDK_DIR}/include/serialcom
+)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/tools/include
     ${CMAKE_CURRENT_SOURCE_DIR}/component/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/core
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/dataprocess
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/filter
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/logger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/serialcom
+    ${LDLIDAR_SDK_DIR}/include/core
+    ${LDLIDAR_SDK_DIR}/include/dataprocess
+    ${LDLIDAR_SDK_DIR}/include/filter
+    ${LDLIDAR_SDK_DIR}/include/logger
+    ${LDLIDAR_SDK_DIR}/include/networkcom
+    ${LDLIDAR_SDK_DIR}/include/serialcom
     ${UDEV_INCLUDE_DIRS}
 )
 
@@ -161,8 +182,6 @@ add_library(${PROJECT_NAME} SHARED
     ${TOOLS_SRC}
     ${COMPONENT_INC}
     ${COMPONENT_SRC}
-    ${LDLIDAR_DRIVER_INC}
-    ${LDLIDAR_DRIVER_SRC}
 )
 target_link_libraries(${PROJECT_NAME}
   ldlidar
@@ -189,11 +208,12 @@ install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/component/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/tools/include/
     ${CMAKE_CURRENT_SOURCE_DIR}/include/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/core/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/dataprocess/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/filter/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/logger/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/serialcom/
+    ${LDLIDAR_SDK_DIR}/include/core/
+    ${LDLIDAR_SDK_DIR}/include/dataprocess/
+    ${LDLIDAR_SDK_DIR}/include/filter/
+    ${LDLIDAR_SDK_DIR}/include/logger/
+    ${LDLIDAR_SDK_DIR}/include/networkcom/
+    ${LDLIDAR_SDK_DIR}/include/serialcom/
     DESTINATION include/${PROJECT_NAME}/
 )
 

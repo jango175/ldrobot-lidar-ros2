@@ -39,10 +39,17 @@ The node is designed to work with
 
 > :pushpin: **Note**: [ROS 2 Rolling](https://docs.ros.org/en/rolling/index.html) is not yet supported because of the missing `nav2_utils` dependency
 
-Clone the repository in your ROS2 workspace:
+Clone the repository and its submodules in your ROS2 workspace:
 
     cd ~/ros2_ws/src/ #use your current ros2 workspace folder
-    git clone https://github.com/Myzhar/ldrobot-lidar-ros2.git
+    git clone --recurse-submodules https://github.com/Myzhar/ldrobot-lidar-ros2.git
+
+If you already cloned without `--recurse-submodules`, initialise and fetch the submodule manually:
+
+    cd ~/ros2_ws/src/ldrobot-lidar-ros2
+    git submodule update --init --recursive
+
+> :pushpin: **Note**: The `ldlidar_component/ldlidar_stl_sdk` submodule points to the official [LDRobot STL SDK](https://github.com/ldrobotSensorTeam/ldlidar_stl_sdk) and must be present for the package to build.
 
 Add dependencies:
 
