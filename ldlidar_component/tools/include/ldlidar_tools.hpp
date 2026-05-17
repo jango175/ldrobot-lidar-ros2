@@ -13,6 +13,11 @@
 //  limitations under the License.
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @file ldlidar_tools.hpp
+ * @brief Miscellaneous utility helpers for the LDLidar ROS2 component.
+ */
+
 #ifndef LDLIDAR_TOOLS_HPP_
 #define LDLIDAR_TOOLS_HPP_
 
@@ -20,7 +25,13 @@
 
 namespace tools
 {
+
+/**
+ * @brief Returns the current host-system time as a nanosecond timestamp.
+ * @return Nanoseconds elapsed since the Unix epoch (system_clock).
+ */
 uint64_t GetSystemTimeStamp(void);
+
 }  // namespace tools
 
 

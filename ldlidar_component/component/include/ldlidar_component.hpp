@@ -118,18 +118,18 @@ protected:
    * @param paramName The name of the parameter.
    * @param defValue The default value of the parameter.
    * @param outVal The output value of the parameter.
-   * @param log_info Optional log information.
-   * @param dynamic Whether the parameter is dynamic.
    * @param description The description of the parameter.
+   * @param dynamic Whether the parameter is dynamic.
+   * @param log_info Optional log information string printed after the value is loaded.
    * @param min The minimum value of the parameter.
    * @param max The maximum value of the parameter.
    */
   template<typename T>
   void getParam(
     std::string paramName, T defValue, T & outVal,
-    std::string log_info = std::string(),
-    bool dynamic = false,
     std::string description = std::string(),
+    bool dynamic = false,
+    std::string log_info = std::string(),
     T min = std::numeric_limits<T>::min(), T max = std::numeric_limits<T>::max());
 
   /**

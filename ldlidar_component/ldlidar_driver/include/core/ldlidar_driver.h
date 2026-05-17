@@ -1,9 +1,7 @@
 /**
  * @file ldlidar_driver.h
  * @author LDRobot (support@ldrobot.com)
- * @brief  ldlidar processing App
- *         This code is only applicable to LDROBOT LiDAR LD14
- * products sold by Shenzhen LDROBOT Co., LTD
+ * @brief Top-level driver API for LDRobot LiDAR devices over serial communication.
  * @version 0.1
  * @date 2021-05-12
  *
@@ -30,112 +28,105 @@
 
 namespace ldlidar {
 
-  typedef enum CommunicationMode
-  {
-    COMM_NO_NULL,
-    COMM_SERIAL_MODE, /* serial communication */
-  } CommunicationModeTypeDef;
+/**
+ * @enum CommunicationModeTypeDef
+ * @brief Supported physical communication channels.
+ */
+typedef enum CommunicationMode
+{
+  COMM_NO_NULL,      ///< Unspecified / not set
+  COMM_SERIAL_MODE,  ///< UART / serial communication
+} CommunicationModeTypeDef;
 
-  class LDLidarDriver {
+/**
+ * @class LDLidarDriver
+ * @brief High-level driver that owns the serial link and packet parser.
+ *
+ * Typical usage:
+ * -# Construct an instance.
+ * -# Call Start() to open the serial port and start the receive thread.
+ * -# Call WaitLidarCommConnect() to confirm the LiDAR is responding.
+ * -# Poll GetLaserScanData() from your processing thread.
+ * -# Call Stop() to cleanly shut down.
+ */
+class LDLidarDriver
+{
 public:
-    LDLidarDriver();
-    ~LDLidarDriver();
+  LDLidarDriver();
+  ~LDLidarDriver();
 
-    /**
-     * @brief start lidar device handle node
-     * @param product_name
-     *        ldlidar product type: ldlidar::LDType, value:
-     *          - ldlidar::LDType::NOVER
-     *          - ldlidar::LDType::LD_06
-     *            ....
-     *        - else definition in "ldlidar_driver/include/ldlidar_datatype.h"
-     * @param serial_port_name
-     *        serial device system path, eg: "/dev/ttyUSB0"
-     * @param serial_baudrate
-     *       serial communication baudrate value(> 0), unit is bit/s.
-     * @retval value is true, start is success;
-     *   value is false, start is failed.
-    */
-    bool Start(
-      LDType product_name,
-      std::string serial_port_name,
-      uint32_t serial_baudrate = 115200,
-      CommunicationModeTypeDef comm_mode = COMM_SERIAL_MODE);
+  /**
+   * @brief Opens the serial port and starts the LiDAR communication.
+   * @param product_name      LDRobot product model (@see ldlidar::LDType).
+   * @param serial_port_name  Path to the serial device (e.g. @c "/dev/ttyUSB0").
+   * @param serial_baudrate   Baud rate in bits per second (default 115200).
+   * @param comm_mode         Communication channel; only COMM_SERIAL_MODE is supported.
+   * @return @c true on success; @c false if the port could not be opened.
+   */
+  bool Start(
+    LDType product_name,
+    std::string serial_port_name,
+    uint32_t serial_baudrate = 115200,
+    CommunicationModeTypeDef comm_mode = COMM_SERIAL_MODE);
 
-    /**
-     * @brief stop lidar device handle node
-     * @param none
-     * @retval value is true, stop is success;
-     *  value is false, stop is failed.
-    */
-    bool Stop(void);
+  /**
+   * @brief Stops the LiDAR communication and closes the serial port.
+   * @return @c true on success; @c false if the driver was not started.
+   */
+  bool Stop(void);
 
-    /**
-     * @brief Whether the connection of the communication channel is normal after the lidar is powered on
-     * @param[in]
-     * *@param timeout:  Wait timeout, in milliseconds
-     * @retval if times >= timeout, return false, communication connection is fail;
-     *   if "times < timeout", return ture, communication connection is successful.
-    */
-    bool WaitLidarCommConnect(int64_t timeout);
+  /**
+   * @brief Blocks until the LiDAR has sent its first valid packet or the timeout expires.
+   * @param timeout  Maximum wait time in milliseconds.
+   * @return @c true if communication was established within the timeout; @c false otherwise.
+   */
+  bool WaitLidarCommConnect(int64_t timeout);
 
-    /**
-     * @brief get lidar laser scan point cloud data
-     * @param [output]
-     * *@param dst: type is ldlidar::Point2D, value is laser scan point cloud data
-     * @param [in]
-     * *@param timeout: Wait timeout, in milliseconds
-     * @retval value is ldlidar::LidarStatus Enum Type, definition in "ldlidar_driver/include/ldlidar_datatype.h", value is:
-     *  ldlidar::LidarStatus::NORMAL   // 雷达正常
-     *  lldlidar::LidarStatus::ERROR    // 雷达异常错误
-     *  ....
-    */
-    LidarStatus GetLaserScanData(Points2D & dst, int64_t timeout = 1000);
+  /**
+   * @brief Retrieves the latest complete 360° point cloud.
+   * @param[out] dst      Destination vector populated with the scan points.
+   * @param[in]  timeout  Maximum wait time for a new frame in milliseconds (default 1000).
+   * @return A ldlidar::LidarStatus value:
+   *   - @c LidarStatus::NORMAL       — new data was returned in @p dst
+   *   - @c LidarStatus::DATA_WAIT    — no new frame yet; @p dst is unchanged
+   *   - @c LidarStatus::DATA_TIME_OUT — timeout elapsed with no data
+   *   - @c LidarStatus::ERROR        — the LiDAR reported a hardware error
+   */
+  LidarStatus GetLaserScanData(Points2D & dst, int64_t timeout = 1000);
 
-    /**
-     * @brief get lidar laser scan frequence
-     * @param [output]
-     * *@param spin_hz: value unit is hz.
-     * @retval value is true, get lidar laser scan frequence is success;
-     *   value is false, get lidar laser scan ferquence is fail.
-    */
-    bool GetLidarScanFreq(double & spin_hz);
+  /**
+   * @brief Returns the current LiDAR rotation speed.
+   * @param[out] spin_hz  Rotation frequency in Hz.
+   * @return @c true on success; @c false if the driver has not been started.
+   */
+  bool GetLidarScanFreq(double & spin_hz);
 
-    /**
-     * @brief register get timestamp handle functional.
-     * @param [input]
-     * *@param get_timestamp_handle: type is `uint64_t (*)(void)`, value is pointer get timestamp fuction.
-     * @retval none
-    */
-    void RegisterGetTimestampFunctional(std::function < uint64_t(void) > get_timestamp_handle);
+  /**
+   * @brief Registers a function that provides nanosecond-resolution host timestamps.
+   *
+   * The registered function is called once per received packet to stamp the data.
+   * If not registered, packets will carry a zero timestamp.
+   *
+   * @param get_timestamp_handle  Callable with signature @c uint64_t(void).
+   */
+  void RegisterGetTimestampFunctional(std::function<uint64_t(void)> get_timestamp_handle);
 
-    /**
-     * @brief open or close filter algorithnm process
-     * @param [input]
-     * *@param is_enable:  value is true, open filter process;
-     *   value is false, close filter process.
-     * @retval none
-    */
-    void EnableFilterAlgorithnmProcess(bool is_enable);
-
-    /**
-     * @brief When the lidar is in an error state, get the error code fed back by the lidar
-     * @param none
-     * @retval errcode
-    */
-    // uint8_t GetLidarErrorCode(void);
+  /**
+   * @brief Enables or disables the spatial noise/near-range filter.
+   * @param is_enable  @c true to enable filtering; @c false to pass raw points through.
+   */
+  void EnableFilterAlgorithnmProcess(bool is_enable);
 
 private:
-    std::string sdk_version_number_;
-    bool is_start_flag_;
-    std::function < uint64_t(void) > register_get_timestamp_handle_;
-    LiPkg * comm_pkg_;
-    SerialInterfaceLinux * comm_serial_;
-    std::chrono::_V2::steady_clock::time_point last_pubdata_times_;
-  };
+  std::string sdk_version_number_;                           ///< SDK version string (for diagnostics)
+  bool is_start_flag_;                                       ///< True between a successful Start() and Stop()
+  std::function<uint64_t(void)> register_get_timestamp_handle_; ///< Stored timestamp callback
+  LiPkg * comm_pkg_;                                         ///< Packet parser / assembler
+  SerialInterfaceLinux * comm_serial_;                       ///< Serial port interface
+  std::chrono::_V2::steady_clock::time_point last_pubdata_times_; ///< Time of the last successful data retrieval
+};
 
 } // namespace ldlidar
 
 #endif // __LDLIDAR_DRIVER_H__
-/********************* (C) COPYRIGHT SHENZHEN LDROBOT CO., LTD *******END OF
- * FILE ********/
+/********************* (C) COPYRIGHT SHENZHEN LDROBOT CO., LTD *******END OF FILE ********/
