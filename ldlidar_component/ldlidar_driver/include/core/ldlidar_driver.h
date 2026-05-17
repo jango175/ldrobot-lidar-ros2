@@ -25,7 +25,6 @@
 #include <functional>
 
 #include "serial_interface_linux.h"
-#include "network_socket_interface_linux.h"
 #include "lipkg.h"
 #include "log_module.h"
 
@@ -35,10 +34,6 @@ namespace ldlidar {
   {
     COMM_NO_NULL,
     COMM_SERIAL_MODE, /* serial communication */
-    COMM_UDP_CLIENT_MODE, /* network communication for UDP client */
-    COMM_UDP_SERVER_MODE, /* network communication for UDP server */
-    COMM_TCP_CLIENT_MODE, /* network communication for TCP client */
-    COMM_TCP_SERVER_MODE /* network communication for TCP server */
   } CommunicationModeTypeDef;
 
   class LDLidarDriver {
@@ -73,12 +68,6 @@ public:
       std::string serial_port_name,
       uint32_t serial_baudrate = 115200,
       CommunicationModeTypeDef comm_mode = COMM_SERIAL_MODE);
-
-    bool Start(
-      LDType product_name,
-      const char * server_ip,
-      const char * server_port,
-      CommunicationModeTypeDef comm_mode = COMM_TCP_CLIENT_MODE);
 
     /**
      * @brief stop lidar device handle node
@@ -156,8 +145,6 @@ private:
     std::function < uint64_t(void) > register_get_timestamp_handle_;
     LiPkg * comm_pkg_;
     SerialInterfaceLinux * comm_serial_;
-    TCPSocketInterfaceLinux * comm_tcp_network_;
-    UDPSocketInterfaceLinux * comm_udp_network_;
     std::chrono::_V2::steady_clock::time_point last_pubdata_times_;
   };
 

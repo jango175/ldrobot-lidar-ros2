@@ -28,6 +28,5 @@ target_include_directories( ldlidar PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/include/dataprocess
   ${CMAKE_CURRENT_SOURCE_DIR}/include/filter
   ${CMAKE_CURRENT_SOURCE_DIR}/include/logger
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/networkcom
   ${CMAKE_CURRENT_SOURCE_DIR}/include/serialcom
 )

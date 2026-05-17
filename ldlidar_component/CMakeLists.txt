@@ -149,7 +149,6 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/dataprocess
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/filter
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/logger
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/networkcom
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/serialcom
     ${UDEV_INCLUDE_DIRS}
 )
@@ -194,7 +193,6 @@ install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/dataprocess/
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/filter/
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/logger/
-    ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/networkcom/
     ${CMAKE_CURRENT_SOURCE_DIR}/ldlidar_driver/include/serialcom/
     DESTINATION include/${PROJECT_NAME}/
 )
