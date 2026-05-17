@@ -12,6 +12,8 @@ LD19             |  LD06
 :-------------------------:|:-------------------------:
 ![ld19](https://user-images.githubusercontent.com/3648617/204473718-803d25d9-605a-4eaa-a047-d5d3524eead8.png)  |  ![ld06](https://user-images.githubusercontent.com/3648617/204473720-97f72c31-188e-4f5c-b98b-1033a5afe91e.png)
 
+You can find a detailed description of the packages in this repository in the [myzhar.tech website](https://myzhar.tech/projects/ros2/ldrobot-lidar-ros2/).
+
 ## Get the lidar
 
 My lidar (LD19) comes from the [LDRobot kickstarter campaing](https://www.kickstarter.com/projects/ldrobot/ld-air-lidar-360-tof-sensor-for-all-robotic-applications) ended in 2021.
@@ -75,7 +77,7 @@ Update the environment variables:
 
 ### Launch file with YAML parameters
 
-The default values of the [parameters of the node](#parameters) can be modified by editing the file [`ldlidar.yaml`](ldlidar_node/config/ldlidar.yaml).
+The default values of the [parameters of the node](#parameters) can be modified by editing the file [`ldlidar.yaml`](ldlidar_node/params/ldlidar.yaml).
 
 Open a terminal console and enter the following command to start the node with customized parameters:
 
@@ -95,13 +97,13 @@ To configure the node, load all the parameters, establish a connection, and acti
 
 Open a new terminal console and enter the following command:
 
-    ros2 lifecycle set /lidar_node configure
+    ros2 lifecycle set /ldlidar_node configure
 
 If the node is correctly configured and the connection is established, `Transitioning successful` is returned. If there are errors, `Transitioning failed` is returned. Check the node log for details on any connection issues.
 
 The node is now in the `INACTIVE` state, enter the following command to activate:
 
-    ros2 lifecycle set /lidar_node activate
+    ros2 lifecycle set /ldlidar_node activate
 
 The node is now activated and the `/ldlidar_node/scan` topic of type `sensor_msgs/msg/LaserScan` is available to be subscribed.
 
