@@ -55,12 +55,9 @@ public:
     // receive from port channel data
     bool ReadFromIO(uint8_t * rx_buf, uint32_t rx_buf_len, uint32_t * rx_len);
     // set receive port channel data callback deal with fuction
-    void SetReadCallback(std::function < void(const char *, size_t length) > callback)
-    {
-      read_callback_ = callback;
-    }
+    void SetReadCallback(std::function < void(const char *, size_t length) > callback);
     // whether open
-    bool IsOpened() {return is_cmd_opened_.load();}
+    bool IsOpened();
 
 private:
     std::thread * rx_thread_;

@@ -81,6 +81,17 @@ LiPkg::~LiPkg()
 
 }
 
+void LiPkg::ClearDataProcessStatus(void)
+{
+  is_frame_ready_ = false;
+  is_poweron_comm_normal_ = false;
+  lidarstatus_ = LidarStatus::NORMAL;
+  last_pkg_timestamp_ = 0;
+  first_frame_ = true;
+  parser_state_ = ParserState::HEADER;
+  parser_count_ = 0;
+}
+
 void LiPkg::SetProductType(LDType type_number)
 {
   product_type_ = type_number;
@@ -124,8 +135,8 @@ bool LiPkg::AnalysisOne(uint8_t byte)
     case ParserState::DATA:
       parser_tmp_[parser_count_++] = byte;
       if (parser_count_ >= PARSER_PKG_COUNT) {
-        memcpy((uint8_t *)&pkg_, parser_tmp_, PARSER_PKG_COUNT);
-        uint8_t crc = CalCRC8((uint8_t *)&pkg_, PARSER_PKG_COUNT - 1);
+        memcpy(reinterpret_cast<uint8_t *>(&pkg_), parser_tmp_, PARSER_PKG_COUNT);
+        uint8_t crc = CalCRC8(reinterpret_cast<uint8_t *>(&pkg_), PARSER_PKG_COUNT - 1);
         parser_state_ = ParserState::HEADER;
         parser_count_ = 0;
         if (crc == pkg_.crc8) {
@@ -325,7 +336,7 @@ LidarStatus LiPkg::GetLidarStatus(void)
 
 void LiPkg::CommReadCallback(const char * byte, size_t len)
 {
-  if (this->Parse((uint8_t *)byte, len)) {
+  if (this->Parse(reinterpret_cast<const uint8_t *>(byte), len)) {
     this->AssemblePacket();
   }
 }

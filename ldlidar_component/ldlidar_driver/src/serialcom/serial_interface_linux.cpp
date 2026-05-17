@@ -165,9 +165,21 @@ bool SerialInterfaceLinux::ReadFromIO(
   return len == -1 ? false : true;
 }
 
+void SerialInterfaceLinux::SetReadCallback(
+  std::function<void(const char *,
+  size_t length)> callback)
+{
+  read_callback_ = callback;
+}
+
+bool SerialInterfaceLinux::IsOpened()
+{
+  return is_cmd_opened_.load();
+}
+
 void SerialInterfaceLinux::RxThreadProc(void * param)
 {
-  SerialInterfaceLinux * cmd_if = (SerialInterfaceLinux *)param;
+  SerialInterfaceLinux * cmd_if = static_cast<SerialInterfaceLinux *>(param);
   char * rx_buf = new char[MAX_ACK_BUF_LEN + 1];
   while (!cmd_if->rx_thread_exit_flag_.load()) {
     uint32_t readed = 0;

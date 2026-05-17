@@ -58,11 +58,7 @@ public:
   }
   virtual void Initializion(const char * path = NULL) = 0;
   virtual void LogPrintInf(const char * str) = 0;
-  void free()
-  {
-    free(this);
-    //this = NULL;
-  }
+  void free();
 
 private:
   virtual void free(ILogRealization * plogger) = 0;
@@ -155,14 +151,7 @@ private:
 
   std::string GetCurrentTime();
 
-  inline uint64_t GetCurrentLocalTimeStamp()
-  {
-    //// 获取系统时间戳
-    std::chrono::time_point < std::chrono::system_clock, std::chrono::nanoseconds > tp =
-      std::chrono::time_point_cast < std::chrono::nanoseconds > (std::chrono::system_clock::now());
-    auto tmp = std::chrono::duration_cast < std::chrono::nanoseconds > (tp.time_since_epoch());
-    return (uint64_t)tmp.count();
-  }
+  uint64_t GetCurrentLocalTimeStamp();
 
   std::string GetFormatValue(std::string str_value);
 

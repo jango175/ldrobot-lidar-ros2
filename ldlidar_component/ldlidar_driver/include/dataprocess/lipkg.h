@@ -81,16 +81,7 @@ public:
 
     LidarStatus GetLidarStatus(void);
 
-    void ClearDataProcessStatus(void)
-    {
-      is_frame_ready_ = false;
-      is_poweron_comm_normal_ = false;
-      lidarstatus_ = LidarStatus::NORMAL;
-      last_pkg_timestamp_ = 0;
-      first_frame_ = true;
-      parser_state_ = ParserState::HEADER;
-      parser_count_ = 0;
-    }
+    void ClearDataProcessStatus(void);
 
 private:
     enum class ParserState { HEADER, VER_LEN, DATA };

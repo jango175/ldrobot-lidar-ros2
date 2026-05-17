@@ -33,6 +33,19 @@
 
 LogModule * LogModule::s_plog_module_ = NULL;
 
+void ILogRealization::free()
+{
+  free(this);
+}
+
+uint64_t LogModule::GetCurrentLocalTimeStamp()
+{
+  std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> tp =
+    std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now());
+  auto tmp = std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch());
+  return (uint64_t)tmp.count();
+}
+
 
 LogModule * LogModule::GetInstance(
   __in const char * filename, __in const char * funcname,
