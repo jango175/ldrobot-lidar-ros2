@@ -1,4 +1,4 @@
-slam_toolbox_node:
+slam_toolbox:
   ros__parameters:
 
     # Plugin params
@@ -36,6 +36,7 @@ slam_toolbox_node:
     tf_buffer_duration: 30.
     stack_size_to_use: 40000000 #// program needs a larger stack size to serialize large maps
     enable_interactive_mode: true
+    use_lifecycle_manager: true # Required to create the lifecycle manager bound
 
     # General Parameters
     use_scan_matching: true

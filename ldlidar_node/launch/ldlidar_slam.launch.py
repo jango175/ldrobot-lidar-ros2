@@ -20,11 +20,11 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import (
-    Node, LifecycleNode,
+    Node,
     ComposableNodeContainer,
     LoadComposableNodes
 )
-
+from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     
@@ -73,19 +73,27 @@ def generate_launch_description():
     )
 
     # SLAM Toolbox node in async mode
-    slam_toolbox_node = LifecycleNode(
-          package='slam_toolbox',
-          executable='async_slam_toolbox_node',
-          namespace='',
-          name='slam_toolbox_node',
-          output='screen',
-          parameters=[
+    slam_toolbox_component = ComposableNode(
+        package='slam_toolbox',
+        namespace='',
+        plugin='slam_toolbox::AsynchronousSlamToolbox',
+        name='slam_toolbox',
+        parameters=[
             # YAML files
-            slam_config_path # Parameters
-          ],
-          remappings=[
-              ('/scan', '/ldlidar_node/scan')
-          ]          
+            slam_config_path, # Parameters
+        ],
+        remappings=[
+            ('/scan', '/ldlidar_node/scan')
+        ],
+        extra_arguments=[{'use_intra_process_comms': True}]
+    )
+
+    # SLAM Toolbox Lifecycle node in container
+    full_container_name = '/' + container_name
+    
+    load_composable_node = LoadComposableNodes(
+        target_container=full_container_name,
+        composable_node_descriptions=[slam_toolbox_component]
     )
 
     # Include LDLidar launch
@@ -134,8 +142,8 @@ def generate_launch_description():
     # Node Container
     ld.add_action(demo_container)
 
-    # Launch SLAM Toolbox node
-    ld.add_action(slam_toolbox_node)
+    # Load SLAM Toolbox node in the container
+    ld.add_action(load_composable_node)
 
     # Launch fake odom publisher node
     ld.add_action(fake_odom)

@@ -124,7 +124,7 @@ Following the list of node parameters:
 - **`comm.serial_port`**: the serial port path
 - **`comm.baudrate`**: the serial port baudrate
 - **`comm.timeout_msec`**: the serial communication timeout in milliseconds
-- **`lidar.model`**: Lidar model [LDLidar_LD06, LDLidar_LD19]
+- **`lidar.model`**: Lidar model [LD06, LD19]
 - **`lidar.rot_verse`**: The rotation verse. Use clockwise if the lidar is mounted upsidedown. [CW, CCW]
 - **`lidar.units`**: distance measurement units [M, CM, MM]
 - **`lidar.frame_id`**: TF frame name for the lidar
