@@ -68,12 +68,6 @@ public:
     void SetProductType(LDType type_number);
     // get Lidar spin speed (Hz)
     double GetSpeed(void);
-    // get lidar spind speed (degree per second) origin
-    uint16_t GetSpeedOrigin(void);
-    // get time stamp of the packet
-    uint16_t GetTimestamp(void);
-    // get lidar measure frequence(Hz)
-    int GetLidarMeasurePointFrequence(void);
 
     void CommReadCallback(const char * byte, size_t len);
 

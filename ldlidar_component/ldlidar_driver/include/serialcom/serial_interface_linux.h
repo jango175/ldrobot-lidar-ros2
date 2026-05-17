@@ -54,8 +54,6 @@ public:
     bool Close();
     // receive from port channel data
     bool ReadFromIO(uint8_t * rx_buf, uint32_t rx_buf_len, uint32_t * rx_len);
-    // transmit data to port channel
-    bool WriteToIo(const uint8_t * tx_buf, uint32_t tx_buf_len, uint32_t * tx_len);
     // set receive port channel data callback deal with fuction
     void SetReadCallback(std::function < void(const char *, size_t length) > callback)
     {

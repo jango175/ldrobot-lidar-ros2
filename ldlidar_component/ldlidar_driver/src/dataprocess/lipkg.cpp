@@ -260,21 +260,6 @@ double LiPkg::GetSpeed(void)
   return speed_ / 360.0;  // unit is hz
 }
 
-uint16_t LiPkg::GetSpeedOrigin(void)
-{
-  return speed_;
-}
-
-uint16_t LiPkg::GetTimestamp(void)
-{
-  return timestamp_;
-}
-
-int LiPkg::GetLidarMeasurePointFrequence(void)
-{
-  return measure_point_frequence_;
-}
-
 bool LiPkg::IsFrameReady(void)
 {
   std::lock_guard<std::mutex> lg(mutex_lock1_);

@@ -165,21 +165,6 @@ bool SerialInterfaceLinux::ReadFromIO(
   return len == -1 ? false : true;
 }
 
-bool SerialInterfaceLinux::WriteToIo(
-  const uint8_t * tx_buf, uint32_t tx_buf_len,
-  uint32_t * tx_len)
-{
-  int32_t len = -1;
-
-  if (IsOpened()) {
-    len = (int32_t)write(com_handle_, tx_buf, tx_buf_len);
-    if ((len != -1) && tx_len) {
-      *tx_len = len;
-    }
-  }
-  return len == -1 ? false : true;
-}
-
 void SerialInterfaceLinux::RxThreadProc(void * param)
 {
   SerialInterfaceLinux * cmd_if = (SerialInterfaceLinux *)param;

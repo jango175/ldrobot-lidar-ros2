@@ -42,13 +42,6 @@ public:
     ~LDLidarDriver();
 
     /**
-     * @brief get lidar sdk version number
-     * @param none
-     * @retval string type, for example is "v2.3.0"
-    */
-    std::string GetLidarSdkVersionNumber(void);
-
-    /**
      * @brief start lidar device handle node
      * @param product_name
      *        ldlidar product type: ldlidar::LDType, value:
@@ -99,8 +92,6 @@ public:
     */
     LidarStatus GetLaserScanData(Points2D & dst, int64_t timeout = 1000);
 
-    LidarStatus GetLaserScanData(LaserScan & dst, int64_t timeout = 1000);
-
     /**
      * @brief get lidar laser scan frequence
      * @param [output]
@@ -134,13 +125,8 @@ public:
     */
     // uint8_t GetLidarErrorCode(void);
 
-    static bool IsOk() {return is_ok_;}
-
-    static void SetIsOkStatus(bool status) {is_ok_ = status;}
-
 private:
     std::string sdk_version_number_;
-    static bool is_ok_;
     bool is_start_flag_;
     std::function < uint64_t(void) > register_get_timestamp_handle_;
     LiPkg * comm_pkg_;

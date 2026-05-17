@@ -23,8 +23,6 @@
 namespace ldlidar
 {
 
-bool LDLidarDriver::is_ok_ = false;
-
 LDLidarDriver::LDLidarDriver()
 : sdk_version_number_("v3.0.3"),
   is_start_flag_(false),
@@ -44,11 +42,6 @@ LDLidarDriver::~LDLidarDriver()
   if (comm_serial_ != nullptr) {
     delete comm_serial_;
   }
-}
-
-std::string LDLidarDriver::GetLidarSdkVersionNumber(void)
-{
-  return sdk_version_number_;
 }
 
 bool LDLidarDriver::Start(
@@ -96,8 +89,6 @@ bool LDLidarDriver::Start(
 
   is_start_flag_ = true;
 
-  SetIsOkStatus(true);
-
   return true;
 }
 
@@ -110,8 +101,6 @@ bool LDLidarDriver::Stop(void)
   comm_serial_->Close();
 
   is_start_flag_ = false;
-
-  SetIsOkStatus(false);
 
   return true;
 }
@@ -147,36 +136,6 @@ LidarStatus LDLidarDriver::GetLaserScanData(Points2D & dst, int64_t timeout)
   if (LidarStatus::NORMAL == status) {
     if (comm_pkg_->GetLaserScanData(dst)) {
       last_pubdata_times_ = std::chrono::steady_clock::now();
-      return LidarStatus::NORMAL;
-    }
-
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() -
-        last_pubdata_times_).count() > timeout)
-    {
-      return LidarStatus::DATA_TIME_OUT;
-    } else {
-      return LidarStatus::DATA_WAIT;
-    }
-  } else {
-    last_pubdata_times_ = std::chrono::steady_clock::now();
-    return status;
-  }
-}
-
-LidarStatus LDLidarDriver::GetLaserScanData(LaserScan & dst, int64_t timeout)
-{
-  if (!is_start_flag_) {
-    return LidarStatus::STOP;
-  }
-
-  LidarStatus status = comm_pkg_->GetLidarStatus();
-  if (LidarStatus::NORMAL == status) {
-    Points2D recvpcd;
-    if (comm_pkg_->GetLaserScanData(recvpcd)) {
-      last_pubdata_times_ = std::chrono::steady_clock::now();
-      dst.stamp = recvpcd.front().stamp;
-      dst.points = recvpcd;
       return LidarStatus::NORMAL;
     }
 
