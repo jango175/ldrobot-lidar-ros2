@@ -41,10 +41,17 @@ The node is designed to work with
 
 > :pushpin: **Note**: [ROS 2 Rolling](https://docs.ros.org/en/rolling/index.html) is not yet supported because of the missing `nav2_utils` dependency
 
-Clone the repository in your ROS2 workspace:
+Clone the repository and its submodules in your ROS2 workspace:
 
     cd ~/ros2_ws/src/ #use your current ros2 workspace folder
-    git clone https://github.com/Myzhar/ldrobot-lidar-ros2.git
+    git clone --recurse-submodules https://github.com/Myzhar/ldrobot-lidar-ros2.git
+
+If you already cloned without `--recurse-submodules`, initialise and fetch the submodule manually:
+
+    cd ~/ros2_ws/src/ldrobot-lidar-ros2
+    git submodule update --init --recursive
+
+> :pushpin: **Note**: The `ldlidar_component/ldlidar_stl_sdk` submodule points to the official [LDRobot STL SDK](https://github.com/ldrobotSensorTeam/ldlidar_stl_sdk) and must be present for the package to build.
 
 Add dependencies:
 
@@ -119,7 +126,7 @@ Following the list of node parameters:
 - **`comm.serial_port`**: the serial port path
 - **`comm.baudrate`**: the serial port baudrate
 - **`comm.timeout_msec`**: the serial communication timeout in milliseconds
-- **`lidar.model`**: Lidar model [LDLiDAR_LD06, LDLiDAR_LD19, LDLiDAR_STL27L]
+- **`lidar.model`**: Lidar model [LD06, LD19]
 - **`lidar.rot_verse`**: The rotation verse. Use clockwise if the lidar is mounted upsidedown. [CW, CCW]
 - **`lidar.units`**: distance measurement units [M, CM, MM]
 - **`lidar.frame_id`**: TF frame name for the lidar

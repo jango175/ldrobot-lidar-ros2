@@ -17,16 +17,17 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node, LifecycleNode
-
+from launch_ros.actions import (
+    Node,
+    ComposableNodeContainer,
+    LoadComposableNodes
+)
+from launch_ros.descriptions import ComposableNode
 
 def generate_launch_description():
     
-    node_name = LaunchConfiguration('node_name')
-
     # Lifecycle manager configuration file
     lc_mgr_config_path = os.path.join(
         get_package_share_directory('ldlidar_node'),
@@ -41,6 +42,24 @@ def generate_launch_description():
         'slam_toolbox.yaml'
     )
 
+    # ROS 2 Component Container
+    container_name='slam_demo_container'
+    distro = os.environ['ROS_DISTRO']
+    if distro == 'foxy':
+        # Foxy does not support the isolated mode
+        container_exec='component_container'
+    else:
+        container_exec='component_container_isolated'
+    demo_container = ComposableNodeContainer(
+                name=container_name,
+                namespace='',
+                package='rclcpp_components',
+                executable=container_exec,
+                composable_node_descriptions=[
+                ],
+                output='screen',
+        )
+
     # Lifecycle manager node
     lc_mgr_node = Node(
         package='nav2_lifecycle_manager',
@@ -54,19 +73,27 @@ def generate_launch_description():
     )
 
     # SLAM Toolbox node in async mode
-    slam_toolbox_node = LifecycleNode(
-          package='slam_toolbox',
-          executable='async_slam_toolbox_node',
-          namespace='',
-          name='slam_toolbox',
-          output='screen',
-          parameters=[
+    slam_toolbox_component = ComposableNode(
+        package='slam_toolbox',
+        namespace='',
+        plugin='slam_toolbox::AsynchronousSlamToolbox',
+        name='slam_toolbox',
+        parameters=[
             # YAML files
-            slam_config_path # Parameters
-          ],
-          remappings=[
-              ('/scan', '/ldlidar_node/scan')
-          ]          
+            slam_config_path, # Parameters
+        ],
+        remappings=[
+            ('/scan', '/ldlidar_node/scan')
+        ],
+        extra_arguments=[{'use_intra_process_comms': True}]
+    )
+
+    # SLAM Toolbox Lifecycle node in container
+    full_container_name = '/' + container_name
+    
+    load_composable_node = LoadComposableNodes(
+        target_container=full_container_name,
+        composable_node_descriptions=[slam_toolbox_component]
     )
 
     # Include LDLidar launch
@@ -76,7 +103,8 @@ def generate_launch_description():
             '/launch/ldlidar_bringup.launch.py'
         ]),
         launch_arguments={
-            'node_name': 'ldlidar_node'
+            'node_name': 'ldlidar_node',
+            'container_name': container_name
         }.items()
     )
 
@@ -111,8 +139,11 @@ def generate_launch_description():
     # Launch Nav2 Lifecycle Manager
     ld.add_action(lc_mgr_node)
 
-    # Launch SLAM Toolbox node
-    ld.add_action(slam_toolbox_node)
+    # Node Container
+    ld.add_action(demo_container)
+
+    # Load SLAM Toolbox node in the container
+    ld.add_action(load_composable_node)
 
     # Launch fake odom publisher node
     ld.add_action(fake_odom)
