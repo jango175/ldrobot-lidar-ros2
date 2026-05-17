@@ -152,6 +152,8 @@ file(GLOB_RECURSE LDLIDAR_SDK_SRC
 
 add_library(ldlidar SHARED ${LDLIDAR_SDK_HDR} ${LDLIDAR_SDK_SRC})
 set_property(TARGET ldlidar PROPERTY POSITION_INDEPENDENT_CODE ON)
+# Upstream SDK omits #include <pthread.h> in its Linux branch — force-include it.
+target_compile_options(ldlidar PRIVATE "-include" "pthread.h")
 target_include_directories(ldlidar PUBLIC
     ${LDLIDAR_SDK_DIR}/include/core
     ${LDLIDAR_SDK_DIR}/include/dataprocess
