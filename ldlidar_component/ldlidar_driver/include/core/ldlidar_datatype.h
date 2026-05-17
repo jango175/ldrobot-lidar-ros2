@@ -26,8 +26,11 @@
 #include <iostream>
 #include <vector>
 
-#define ANGLE_TO_RADIAN(angle) ((angle) * 3141.59 / 180000)
-#define RADIAN_TO_ANGLED(angle) ((angle) * 180000 / 3141.59)
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+#define ANGLE_TO_RADIAN(angle) ((angle) * (M_PI / 180.0))
+#define RADIAN_TO_ANGLED(angle) ((angle) * (180.0 / M_PI))
 
 namespace ldlidar {
 

@@ -94,9 +94,13 @@ public:
       lidarstatus_ = LidarStatus::NORMAL;
       last_pkg_timestamp_ = 0;
       first_frame_ = true;
+      parser_state_ = ParserState::HEADER;
+      parser_count_ = 0;
     }
 
 private:
+    enum class ParserState { HEADER, VER_LEN, DATA };
+
     LDType product_type_;
     uint16_t timestamp_;
     double speed_;
@@ -108,6 +112,11 @@ private:
     std::function < uint64_t(void) > get_timestamp_;
     uint64_t last_pkg_timestamp_;
     bool first_frame_;
+
+    ParserState parser_state_;
+    uint16_t parser_count_;
+    uint8_t parser_tmp_[128];
+    static constexpr uint16_t PARSER_PKG_COUNT = sizeof(LiDARFrameTypeDef);
 
     LiDARFrameTypeDef pkg_;
     Points2D frame_tmp_;

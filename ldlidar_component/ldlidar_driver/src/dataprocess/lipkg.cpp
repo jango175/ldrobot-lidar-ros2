@@ -69,9 +69,11 @@ LiPkg::LiPkg()
   measure_point_frequence_(4500),
   get_timestamp_(nullptr),
   last_pkg_timestamp_(0),
-  first_frame_(true)
+  first_frame_(true),
+  parser_state_(ParserState::HEADER),
+  parser_count_(0)
 {
-
+  memset(parser_tmp_, 0, sizeof(parser_tmp_));
 }
 
 LiPkg::~LiPkg()
@@ -102,40 +104,30 @@ void LiPkg::SetProductType(LDType type_number)
 
 bool LiPkg::AnalysisOne(uint8_t byte)
 {
-  static enum
-  {
-    HEADER,
-    VER_LEN,
-    DATA,
-  } state = HEADER;
-  static uint16_t count = 0;
-  static uint8_t tmp[128] = {0};
-  static uint16_t pkg_count = sizeof(LiDARFrameTypeDef);
-
-  switch (state) {
-    case HEADER:
+  switch (parser_state_) {
+    case ParserState::HEADER:
       if (byte == PKG_HEADER) {
-        tmp[count++] = byte;
-        state = VER_LEN;
+        parser_tmp_[parser_count_++] = byte;
+        parser_state_ = ParserState::VER_LEN;
       }
       break;
-    case VER_LEN:
+    case ParserState::VER_LEN:
       if (byte == PKG_VER_LEN) {
-        tmp[count++] = byte;
-        state = DATA;
+        parser_tmp_[parser_count_++] = byte;
+        parser_state_ = ParserState::DATA;
       } else {
-        state = HEADER;
-        count = 0;
+        parser_state_ = ParserState::HEADER;
+        parser_count_ = 0;
         return false;
       }
       break;
-    case DATA:
-      tmp[count++] = byte;
-      if (count >= pkg_count) {
-        memcpy((uint8_t *)&pkg_, tmp, pkg_count);
-        uint8_t crc = CalCRC8((uint8_t *)&pkg_, pkg_count - 1);
-        state = HEADER;
-        count = 0;
+    case ParserState::DATA:
+      parser_tmp_[parser_count_++] = byte;
+      if (parser_count_ >= PARSER_PKG_COUNT) {
+        memcpy((uint8_t *)&pkg_, parser_tmp_, PARSER_PKG_COUNT);
+        uint8_t crc = CalCRC8((uint8_t *)&pkg_, PARSER_PKG_COUNT - 1);
+        parser_state_ = ParserState::HEADER;
+        parser_count_ = 0;
         if (crc == pkg_.crc8) {
           return true;
         } else {
@@ -196,6 +188,12 @@ bool LiPkg::Parse(const uint8_t * data, long len)
 
 bool LiPkg::AssemblePacket()
 {
+  // Guard against unbounded growth when speed_ is zero (motor stalled/starting)
+  if (frame_tmp_.size() > static_cast<size_t>(measure_point_frequence_)) {
+    frame_tmp_.clear();
+    return false;
+  }
+
   float last_angle = 0;
   Points2D tmp, data;
   int count = 0;

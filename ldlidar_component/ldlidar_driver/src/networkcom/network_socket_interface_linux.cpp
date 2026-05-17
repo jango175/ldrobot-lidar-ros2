@@ -445,7 +445,7 @@ bool TCPSocketInterfaceLinux::TransToNet(uint8_t * tx_buf, uint32_t tx_buff_len,
   if (IsCreated()) {
     if (TCP_CLIENT == ncd_) {
       len = (int32_t)send(com_sockfd_, tx_buf, tx_buff_len, 0);
-      if ((len != -1) && (tx_len == nullptr)) {
+      if ((len != -1) && (tx_len != nullptr)) {
         *tx_len = len;
       }
     } else if (TCP_SERVER == ncd_) {
