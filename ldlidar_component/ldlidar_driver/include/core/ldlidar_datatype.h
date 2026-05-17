@@ -40,11 +40,11 @@ namespace ldlidar {
 enum class LDType
 {
   NO_VERSION, ///< Unspecified / not set
-  LD_06,      ///< LDLiDAR LD-06
-  LD_19,      ///< LDLiDAR LD-19
-  STL_06P,    ///< LDLiDAR STL-06P
-  STL_26,     ///< LDLiDAR STL-26
-  STL_27L,    ///< LDLiDAR STL-27L
+  LD_06,      ///< LDLidar LD-06
+  LD_19,      ///< LDLidar LD-19
+  STL_06P,    ///< LDLidar STL-06P
+  STL_26,     ///< LDLidar STL-26
+  STL_27L,    ///< LDLidar STL-27L
 };
 
 /**

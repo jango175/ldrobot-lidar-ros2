@@ -115,12 +115,10 @@ bool LdLidarComponent::getLidarParams()
 
   // ----> Lidar config
   getParam("lidar.model", _lidarModel, _lidarModel, " * Lidar frame: ", "Name of the lidar frame");
-  if (_lidarModel == "LDLiDAR_LD06") {
+  if (_lidarModel == "LDLidar_LD06") {
     _lidarType = ldlidar::LDType::LD_06;
-  } else if (_lidarModel == "LDLiDAR_LD19") {
+  } else if (_lidarModel == "LDLidar_LD19") {
     _lidarType = ldlidar::LDType::LD_19;
-  } else if (_lidarModel == "LDLiDAR_STL27L") {
-    _lidarType = ldlidar::LDType::STL_27L;
   } else {
     RCLCPP_ERROR_STREAM(
       get_logger(), " !!! The parameter 'lidar.model' is not valid! -> " << _lidarModel.c_str() );
