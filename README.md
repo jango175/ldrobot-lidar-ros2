@@ -218,3 +218,6 @@ the final result should be similar to
     | [metadata] Idle System CPU Util. (%) : 0.333                                               |
     | [metadata] Benchmark Mode : 3                                                              |
     +--------------------------------------------------------------------------------------------+
+
+## Sources
+* https://github.com/Myzhar/ldrobot-lidar-ros2
